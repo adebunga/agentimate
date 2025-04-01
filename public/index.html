@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentimate - The agent who animates your idea</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --text-color: #ffffff;
+            --bg-color: #0A0A0A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .logo-heart {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            background: transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-heart {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            position: relative;
+            font-size: 4rem;
+            color: var(--primary-color);
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            position: relative;
+        }
+
+        .main-title .letter {
+            display: inline-block;
+            transform-origin: 50% 0%;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .prompt-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prompt-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            outline: none;
+            font-family: 'Segoe UI', sans-serif;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+
+        .animation-preview {
+            width: 100%;
+            height: 120px;
+            margin-top: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animation styles */
+        .preview-puppy {
+            font-size: 3rem;
+            transform-origin: bottom;
+        }
+
+        .preview-login {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--text-color);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .preview-heart {
+            color: var(--primary-color);
+            font-size: 3rem;
+        }
+
+        .preview-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .preview-particles {
+            position: relative;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .preview-text {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-left: 1px;
+            vertical-align: middle;
+            animation: blink 0.53s infinite;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .prompt-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 107, 107, 0.1) 100%
+            );
+            transform: translateZ(-1px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .suggestions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .animated-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .shape.circle {
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        .shape.square {
+            border: 2px solid var(--primary-color);
+        }
+
+        .shape.triangle {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid var(--primary-color);
+            background: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes"></div>
+
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <span class="logo-heart">♥</span>
+            agentimate
+        </a>
+        <div class="nav-links">
+            <a href="/support">Support</a>
+            <a href="/launched">Launched</a>
+            <a href="/learn">Learn</a>
+        </div>
+        <div class="auth-buttons">
+            <a href="/signin" class="btn btn-outline">Sign in</a>
+            <a href="/signup" class="btn btn-primary">Sign up</a>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-heart" id="animated-heart">♥</div>
+        <h1 class="main-title">Idea to animation in seconds.</h1>
+        <p class="subtitle">Agentimate is your superhuman design assistant.</p>
+        
+        <div class="prompt-container">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="text" class="prompt-input" readonly>
+                <span class="cursor"></span>
+            </div>
+            <div class="animation-preview" id="preview-container"></div>
+        </div>
+
+        <svg class="animated-path" viewBox="0 0 1000 200">
+            <path d="M0,100 C150,0 350,200 500,100 C650,0 850,200 1000,100" />
+        </svg>
+
+        <div class="features">
+            <div class="feature-card" data-tilt>
+                <span class="feature-icon">🎨</span>
+                <h3 class="feature-title">Smart Design</h3>
+                <p class="feature-description">AI-powered animation suggestions that understand your vision and bring it to life.</p>
+            </div>
+            <div class="feature-card" data-tilt>
+                <span class="feature-icon">⚡</span>
+                <h3 class="feature-title">Real-time</h3>
+                <p class="feature-description">Instant animation iterations that adapt to your feedback in real-time.</p>
+            </div>
+            <div class="feature-card" data-tilt>
+                <span class="feature-icon">🤝</span>
+                <h3 class="feature-title">Collaborative</h3>
+                <p class="feature-description">Share and iterate together with your team in a seamless workflow.</p>
+            </div>
+        </div>
+
+        <div class="suggestions">
+            <div class="suggestion-chip">Loading animations</div>
+            <div class="suggestion-chip">Button effects</div>
+            <div class="suggestion-chip">Page transitions</div>
+            <div class="suggestion-chip">Micro-interactions</div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <script>
+        // Initialize tilt effect on feature cards
+        VanillaTilt.init(document.querySelectorAll(".feature-card"), {
+            max: 10,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2,
+        });
+
+        // Create floating shapes
+        const shapesContainer = document.querySelector('.floating-shapes');
+        const numberOfShapes = 15;
+        const shapes = ['square', 'circle', 'triangle'];
+
+        for (let i = 0; i < numberOfShapes; i++) {
+            const shape = document.createElement('div');
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            shape.className = `shape ${shapeType}`;
+            shape.style.left = `${Math.random() * 100}%`;
+            shape.style.top = `${Math.random() * 100}%`;
+            shapesContainer.appendChild(shape);
+        }
+
+        // Animate the path
+        anime({
+            targets: '.animated-path path',
+            strokeDashoffset: [anime.setDashoffset, 0],
+            easing: 'easeInOutSine',
+            duration: 3000,
+            delay: function(el, i) { return i * 250 },
+            direction: 'alternate',
+            loop: true
+        });
+
+        // Feature cards entrance animation
+        anime.timeline({
+            targets: '.feature-card',
+            delay: anime.stagger(200),
+        })
+        .add({
+            translateY: [100, 0],
+            rotateX: [45, 0],
+            opacity: [0, 1],
+            duration: 1500,
+            easing: 'easeOutExpo',
+        })
+        .add({
+            targets: '.feature-icon',
+            scale: [0, 1],
+            rotate: [45, 0],
+            duration: 800,
+            easing: 'easeOutElastic(1, .5)',
+        }, '-=800');
+
+        // Enhanced heart animation with morphing
+        const heartAnimation = anime({
+            targets: '#animated-heart',
+            scale: [1, 1.2, 1],
+            rotate: {
+                value: [-15, 15],
+                duration: 1800,
+                easing: 'easeInOutSine'
+            },
+            translateY: {
+                value: [-5, 5],
+                duration: 1200,
+                easing: 'easeInOutQuad'
+            },
+            color: {
+                value: ['#FF6B6B', '#FF8E8E'],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            },
+            duration: 1500,
+            direction: 'alternate',
+            loop: true
+        });
+
+        // Enhanced title animation with letter staggering and 3D effect
+        const titleEl = document.querySelector('.main-title');
+        titleEl.innerHTML = titleEl.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+
+        anime.timeline()
+            .add({
+                targets: '.main-title .letter',
+                translateY: [-100, 0],
+                translateZ: [-100, 0],
+                rotateX: [-90, 0],
+                opacity: [0, 1],
+                easing: "easeOutExpo",
+                duration: 1400,
+                delay: anime.stagger(50)
+            });
+
+        // Floating shapes with more dynamic movement
+        anime({
+            targets: '.shape',
+            translateX: function() {
+                return anime.random(-200, 200);
+            },
+            translateY: function() {
+                return anime.random(-200, 200);
+            },
+            rotate: function() {
+                return anime.random(-360, 360);
+            },
+            scale: function() {
+                return anime.random(0.5, 2);
+            },
+            opacity: {
+                value: [0.1, 0.3],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            },
+            duration: function() {
+                return anime.random(3000, 6000);
+            },
+            delay: anime.stagger(100),
+            direction: 'alternate',
+            loop: true,
+            easing: 'easeInOutQuad'
+        });
+
+        // Suggestion chips animation
+        anime({
+            targets: '.suggestion-chip',
+            translateY: [20, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(100, {from: 'center'}),
+            duration: 800,
+            easing: 'easeOutElastic(1, .5)'
+        });
+
+        // Prompt container animation
+        anime({
+            targets: '.prompt-container',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            scale: [0.95, 1],
+            duration: 1000,
+            easing: 'easeOutExpo'
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const prompts = [
+                "Create a bouncing animation for a happy puppy...",
+                "Design a smooth transition for a login form...",
+                "Animate a heart beating with love...",
+                "Make a loading spinner with gradient colors...",
+                "Create a particle explosion effect...",
+                "Animate text appearing letter by letter..."
+            ];
+            
+            const input = document.querySelector('.prompt-input');
+            const cursor = document.querySelector('.cursor');
+            const previewContainer = document.querySelector('#preview-container');
+            let currentPromptIndex = 0;
+            let currentCharIndex = 0;
+            let isDeleting = false;
+            let typingSpeed = 100;
+            let deletingSpeed = 50;
+            let pauseBeforeDelete = 2000;
+            let pauseBeforeNextPrompt = 500;
+            let currentAnimation = null;
+
+            function updatePreviewAnimation(index) {
+                if (currentAnimation) {
+                    currentAnimation.pause();
+                }
+                
+                previewContainer.innerHTML = '';
+                
+                switch(index) {
+                    case 0: // Puppy
+                        const puppy = document.createElement('div');
+                        puppy.className = 'preview-puppy';
+                        puppy.textContent = '🐶';
+                        previewContainer.appendChild(puppy);
+                        currentAnimation = anime({
+                            targets: '.preview-puppy',
+                            translateY: [-20, 0],
+                            scale: [1.1, 1],
+                            duration: 600,
+                            direction: 'alternate',
+                            loop: true,
+                            easing: 'easeInOutQuad'
+                        });
+                        break;
+                    
+                    case 1: // Login form
+                        const form = document.createElement('div');
+                        form.className = 'preview-login';
+                        previewContainer.appendChild(form);
+                        currentAnimation = anime({
+                            targets: '.preview-login',
+                            scale: [0, 1],
+                            rotate: [45, 0],
+                            opacity: [0, 1],
+                            duration: 1000,
+                            easing: 'easeOutElastic(1, .5)',
+                            loop: true
+                        });
+                        break;
+                    
+                    case 2: // Heart
+                        const heart = document.createElement('div');
+                        heart.className = 'preview-heart';
+                        heart.textContent = '♥';
+                        previewContainer.appendChild(heart);
+                        currentAnimation = anime({
+                            targets: '.preview-heart',
+                            scale: [1, 1.2],
+                            opacity: [0.5, 1],
+                            duration: 800,
+                            direction: 'alternate',
+                            loop: true,
+                            easing: 'easeInOutQuad'
+                        });
+                        break;
+                    
+                    case 3: // Spinner
+                        const spinner = document.createElement('div');
+                        spinner.className = 'preview-spinner';
+                        previewContainer.appendChild(spinner);
+                        currentAnimation = anime({
+                            targets: '.preview-spinner',
+                            rotate: 360,
+                            borderTopColor: ['#FF6B6B', '#FFB6B6', '#FF6B6B'],
+                            borderRightColor: ['#FFB6B6', '#FF6B6B', '#FFB6B6'],
+                            duration: 1500,
+                            loop: true,
+                            easing: 'linear'
+                        });
+                        break;
+                    
+                    case 4: // Particles
+                        for (let i = 0; i < 12; i++) {
+                            const particle = document.createElement('div');
+                            particle.className = 'preview-particles';
+                            previewContainer.appendChild(particle);
+                        }
+                        currentAnimation = anime({
+                            targets: '.preview-particles',
+                            translateX: function() { return anime.random(-50, 50); },
+                            translateY: function() { return anime.random(-50, 50); },
+                            scale: [0, 1],
+                            opacity: {
+                                value: [1, 0],
+                                duration: 1000,
+                            },
+                            delay: anime.stagger(100),
+                            duration: 1000,
+                            loop: true,
+                            easing: 'easeOutExpo'
+                        });
+                        break;
+                    
+                    case 5: // Text animation
+                        const text = document.createElement('div');
+                        text.className = 'preview-text';
+                        text.textContent = 'Hello!';
+                        previewContainer.appendChild(text);
+                        currentAnimation = anime({
+                            targets: '.preview-text',
+                            opacity: [0, 1],
+                            duration: 1500,
+                            loop: true,
+                            direction: 'alternate',
+                            easing: 'easeInOutQuad'
+                        });
+                        break;
+                }
+            }
+
+            function updateCursorPosition() {
+                const textWidth = input.value.length * 11.5;
+                cursor.style.left = `${textWidth + 8}px`;
+            }
+
+            function typeText() {
+                const currentPrompt = prompts[currentPromptIndex];
+                
+                if (!isDeleting) {
+                    input.value = currentPrompt.substring(0, currentCharIndex + 1);
+                    currentCharIndex++;
+                    updateCursorPosition();
+
+                    if (currentCharIndex === currentPrompt.length) {
+                        isDeleting = true;
+                        setTimeout(typeText, pauseBeforeDelete);
+                        return;
+                    }
+                    setTimeout(typeText, typingSpeed);
+                } else {
+                    input.value = currentPrompt.substring(0, currentCharIndex - 1);
+                    currentCharIndex--;
+                    updateCursorPosition();
+
+                    if (currentCharIndex === 0) {
+                        isDeleting = false;
+                        currentPromptIndex = (currentPromptIndex + 1) % prompts.length;
+                        updatePreviewAnimation(currentPromptIndex);
+                        setTimeout(typeText, pauseBeforeNextPrompt);
+                        return;
+                    }
+                    setTimeout(typeText, deletingSpeed);
+                }
+            }
+
+            // Start the typing animation and show first preview
+            updatePreviewAnimation(0);
+            typeText();
+        });
+    </script>
+</body>
+</html> 
